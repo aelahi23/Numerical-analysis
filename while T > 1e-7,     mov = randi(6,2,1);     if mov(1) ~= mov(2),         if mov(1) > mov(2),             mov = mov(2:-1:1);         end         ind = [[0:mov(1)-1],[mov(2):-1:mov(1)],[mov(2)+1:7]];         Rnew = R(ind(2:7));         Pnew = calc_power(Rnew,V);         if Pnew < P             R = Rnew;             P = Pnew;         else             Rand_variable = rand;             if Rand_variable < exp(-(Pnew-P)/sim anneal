@@ -1,0 +1,41 @@
+%%% Simulated annealing solution to simple loop power problem
+%%% WPH, last modified 27 Oct 18
+
+%%%%% Six resistors that we can arrange in arbitrary order.
+
+
+
+T = 100;
+R = [10; 8; 3; 3; 8;10;
+     10;17;10; 5;10;17;
+     19;12;10;10;12;17;
+     19;12;12;19;26;21;
+     19;21];
+V = 1;
+P = calc_power(R,V);
+
+while T > 1e-7,
+    mov = randi(26,10,10);
+    if mov(1) ~= mov(2),
+        if mov(1) > mov(2),
+            mov = mov(2:-1:1);
+        end
+        ind = [[0:mov(1)-1],[mov(2):-1:mov(1)],[mov(2)+1:27]];
+        Rnew = R(ind(2:27));
+        Pnew = calc_power(Rnew,V);
+        if Pnew < P
+            R = Rnew;
+            P = Pnew;
+        else
+            Rand_variable = rand;
+            if Rand_variable < exp(-(Pnew-P)/T),
+                R = Rnew;
+                P = Pnew;
+            end
+        end
+        T = T * 0.999;
+    end
+end
+clc
+disp(['Minimum power is ' num2str(P) ' W'])
+disp(['  with permutation R = [' num2str(R') ']'])
